@@ -2,12 +2,11 @@
 
 require_once('connection.php');
 
-//$table = $_POST["table"];
-//$id = $_POST["id"];
 $table = $_GET["table"];
 $id = $_GET["id"];
 
-$query = "SELECT * FROM `$table` WHERE id = $id+1";
+//$query = "SELECT * FROM `Prova storia audio` WHERE id = 1";
+$query = "SELECT * FROM `provaaudio` WHERE id = 1";
 $stmt = $conn->prepare($query);
 $stmt->execute();
  
@@ -17,16 +16,13 @@ $num = $stmt->rowCount();
 if ($num) {
     // if found
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    //fetchAll???
-   
     header("Content-type: video/mp4");
- 	print $row['Video'];   
-    //$json = json_encode($row);
-	//echo json_encode($row);
+    //header("Content-type: audio/mp3");
+ 	print $row['Audio'];
    
     exit;
 } else {
-    echo "Nessun video trovato";
+    echo "Nessun audio trovato";
 }
 $conn=null;
 ?>

@@ -1,0 +1,32 @@
+.back-to-top{
+	position:fixed;
+    bottom:5%;
+    right:5%;
+    display:flex;
+    padding:15px;
+    padding-top:10px;
+    padding-bottom:10px;
+    animation:fadeInRight;
+    animation-duration:0.6s;
+    border-radius:15px;
+    z-index:1000;
+    background-color: var(--opaque-black);
+    transition:0.5s;
+}
+.back-to-top.fadeOut {
+	animation:fadeOutRight;
+    animation-duration:1s;
+}
+.back-to-top i{
+	width:100%;
+	font-size:34px;
+    text-align:center;
+    color:var(--white);
+    cursor:pointer;
+}
+.back-to-top:hover{
+    transition:0.5s;
+    background-color: var(--red);
+    margin-bottom:5px;
+    cursor:pointer;
+}

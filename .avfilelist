@@ -1,0 +1,28 @@
+### !!! PLEASE DON'T DELETE THIS FILE !!!
+###
+### !!! NON CANCELLARE  QUESTO FILE !!!
+###
+.htaccess
+wp-cron.php
+bridge.php
+wp-admin
+wp-load.php
+wp-signup.php
+wp-config-sample.php
+wp-config.php
+wp-comments-post.php
+.ftpquota
+xmlrpc.php
+readme.html
+wp-links-opml.php
+wp-includes
+wp-mail.php
+wp-blog-header.php
+wp-login.php
+wp-settings.php
+index.php
+wp-activate.php
+wp-trackback.php
+.avfilelist
+wp-content
+license.txt

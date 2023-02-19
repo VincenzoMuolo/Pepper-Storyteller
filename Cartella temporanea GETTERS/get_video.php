@@ -4,10 +4,11 @@ require_once('connection.php');
 
 //$table = $_POST["table"];
 //$id = $_POST["id"];
-$table = $_GET["table"];
-$id = $_GET["id"];
+//$table = $_GET["table"];
+//$id = $_GET["id"];
 
-$query = "SELECT * FROM `$table` WHERE id = $id+1";
+//$query = "SELECT * FROM `$table` WHERE id = $id+1";
+$query = "SELECT * FROM ProvaVideo WHERE id = 1";
 $stmt = $conn->prepare($query);
 $stmt->execute();
  
