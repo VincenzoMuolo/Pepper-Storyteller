@@ -9,7 +9,10 @@ title-text
  
 */
 function check_title() {
-	let current_title=document.getElementById("title-text").value;
+	let title = document.getElementById("title-text");
+    /*Rimuovo eventuali spazi ad inizio o fine testo del titolo*/
+    title.value = title.value.trim();
+	let current_title = title.value;
 	$.ajax({
           type: 'GET',
           url: 'get_titles.php',
@@ -98,7 +101,9 @@ function goto_check_paragraph(){
 }
 
 function check_paragraph(current_paragraph){
-	var num=current_paragraph.id.substr(-1, current_paragraph.id.lenght);
+	var id = current_paragraph.id;
+    var match = id.match(/\d+$/);
+    var num = match ? match[0] : null;
 	if(current_paragraph.value.length>1000){
     	document.getElementById("par-error"+num).style.display="block";
         document.getElementById("par-error"+num).textContent="Il paragrafo supera il numero massimo di caratteri";	
@@ -132,8 +137,12 @@ function check_submit_state(){
     }
 }
 
-
-
-
-
-
+function checkQuestionParagraph(paragraph, counter){
+	let isClosing = document.getElementById("end_story_here"+counter);
+	if(isClosing.checked){
+    	check_paragraph(paragraph);
+    }else{
+    	document.getElementById("par-error"+counter).style.display="none";
+        sessionStorage.setItem("is-par-ok"+counter, "YES");	
+    }
+}
