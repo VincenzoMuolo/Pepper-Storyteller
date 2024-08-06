@@ -64,28 +64,28 @@
                 <div class="two-pane-choose">
                     <div class="left-choose-side">
                         <h4>Il sito</h4>
-                        <p>Permette agli utenti di pubblicare le proprie storie ed eventualmente leggere quelle già presenti nell'archivio.
+                        <p>Permette agli utenti di pubblicare storie e test, oltre che leggere quelle già presenti nell'archivio.
                         <br><br><a href="#create-story">Prosegui&nbsp<i class="fas fa-sign-in-alt"></i></a></p>
                     </div>
                     <div class="right-choose-side">
                     	<h4>L'applicazione</h4>
-                        <p>Installata direttamente sul robot, permette di sfogliare e scegliere la storia da far raccontare a Pepper.
+                        <p>Installata direttamente sul robot, permette di sfogliare e scegliere il contenuto, storia o test da far raccontare a Pepper.
                         <!-- Bottone che re-indirizza al contact-us
                         <br><br><a href="#id-contact-us">Prosegui&nbsp<i class="fas fa-sign-in-alt"></i></a></p>-->
                     </div>
                 </div>
             </div>
             <div id="create-story" class="writeStory">
-                <h2>SCRIVI UNA STORIA!</h2>
+                <h2>PUBBLICA I TUOI CONTENUTI</h2>
                 <div class="two-pane-text">
                     <div class="left-text-side">
-                        <p><b>Nel sito</b> è presente un editor che vi permetterà di scrivere storie interattive da far raccontare a Pepper.
-                            <br><br><b>Le storie</b> sono suddivise per paragrafi ed ogni paragrafo potrà avere come allegati una foto o un colore.
+                        <p><b>Nel sito</b> è presente un editor che vi permetterà di scrivere storie interattive e test da far raccontare a Pepper.
+                            <br><br><b>Storie</b> e <b>Test</b> sono suddivisi per paragrafi ed ad ogni paragrafo è possibile aggiungere allegati o domande per rendere il contenuto interattivo.
                         </p>
                     </div>
                     <div class="right-text-side">
-                        <p><b>Gli allegati</b> hanno come obiettivo fornire un feedback visivo, rendendo le storie più immersive!
-                        <br><br>Terminata la storia, è possibile ultimare il racconto con una <b>morale (opzionale)</b>, in modo da riassumere il messaggio, la riflessione che la vostra storia vuole trasmettere .
+                        <p><b>Gli allegati</b> hanno come obiettivo fornire un feedback visivo, aumentando l'immersività!
+                        <br><br>Terminata una storia, è possibile ultimare il racconto con una <b>morale (opzionale)</b>, in modo da riassumere il messaggio, la riflessione che la vostra storia vuole trasmettere .
                             <br><br><br>L'accesso all'editor richiede una veloce
                             <a href="registration.php"> registrazione.&nbsp<i class="fas fa-sign-in-alt"></i></a>
                         </p>
@@ -93,7 +93,7 @@
                 </div>
                 <div class="card-footer">
                 	<h3>OPPURE</h3>	
-                	<button class="story-button" onclick="goto_stories();">Leggi le storie pubblicate&nbsp&nbsp<i class="fas fa-book-open"></i></button>
+                	<button class="story-button" onclick="goto_stories();">Leggi i contenuti già pubblicati&nbsp&nbsp<i class="fas fa-book-open"></i></button>
             	</div>
             </div>
             <!--Ho reso l'intero blocco 'none', quindi invisibile e soprattutto senza occupare spazio -->
