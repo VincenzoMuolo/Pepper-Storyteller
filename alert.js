@@ -305,11 +305,35 @@ function showAlertStory(){
 	});
 
 }
+function showAlertTest(){
+	swal({
+		icon: "success",
+        title: "Test inviato!",
+        text: "Grazie per il vostro contributo!\n Appena disponibile, un amministratore eseguirà un controllo sul materiale inviato per accertarsi che sia coerente e soprattutto privo di contenuti inappropriati.",
+        buttons: {
+            confirm: {
+            	text: "Ho capito",
+                className:"confirm-button",
+                value: "confirm",
+			},
+            cancel:false,
+		},
+	}).then((value) => {
+		switch (value) {
+            case "confirm":
+                window.location.href = "homepage-logged.php";
+                break;
+			default:
+                break;
+            }
+	});
+
+}
 
 function showAlertEditStory(){
 	swal({
 		icon: "success",
-        title: "Modifica storia inviata!",
+        title: "Modifica inviata!",
         text: "Appena disponibile, un amministratore eseguirà un controllo sul materiale inviato per accertarsi che la storia sia coerente e soprattutto priva di contenuti inappropriati.",
         buttons: {
             confirm: {
@@ -339,7 +363,8 @@ function check_images(container){
 function remove_old_image(element){
 	swal({
     	icon: "warning",
-        text: "Cancellare l'immagine attuale?",
+        title: "Cancellare l'immagine attuale?",
+        text: "La cancellazione effettiva avverrà con l'invio della modifica.",
         buttons: {
               confirm: {
                 text: "Cancella",
@@ -354,8 +379,10 @@ function remove_old_image(element){
               	document.getElementById("image-link"+element.id).style.display="none";
                 document.getElementById("checkImage"+element.id).classList.toggle("checkState");
                 document.getElementById("image-state"+element.id).value="true";
-                document.getElementById("remove-img-btn"+element.id).style.display="none";
+                //document.getElementById("remove-img-btn"+element.id).style.display="none";
                 document.getElementById("load-image-box"+element.id).style.display="flex";
+                document.getElementById("imageSelector"+element.id).style.height="250px";
+                
                 break;
               default:
                 break;
@@ -417,4 +444,3 @@ function remove_story(element){
             }
 		  });
 }
-
