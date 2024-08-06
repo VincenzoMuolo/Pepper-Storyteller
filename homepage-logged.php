@@ -27,11 +27,12 @@
             <!--navigationBar-->   
                 <nav id="nav" class="navigation">
                     <div class="left-nav-side">
-                        <h2 id="navbar-title">pepper storyteller</h2>
+                        <h2 id="navbar-title"><a href="homepage-logged.php" style="text-decoration: none; color: white;">pepper storyteller</a></h2>
                     </div>  
                     <div class="right-nav-side">
                         <a id="nav-item1" href="homepage-logged.php" class="nav-active">HOMEPAGE</a>
                         <a id="nav-item2" href="new-story.php" >NUOVA STORIA</a>
+                        <a id="nav-item5" href="new-story-question.php" >NUOVO TEST</a>
                         <a id="nav-item3" href="profile.php">PROFILO</a>
                         <a id="nav-item4" href="#" id="logoutBTN" onclick="logout()">LOGOUT</a>
                         <a id="index-option" href="index.php" style="display:none;">TORNA ALLA HOMEPAGE</a>
@@ -45,13 +46,14 @@
                     <div class="right-nav-side-portrait">
                         <a id="nav-item1" href="homepage-logged.php" class="nav-active">HOMEPAGE</a>
                         <a id="nav-item2" href="new-story.php" >NUOVA STORIA</a>
+                        <a id="nav-item5" href="new-story-question.php" >NUOVO TEST</a>
                         <a id="nav-item3" href="profile.php">PROFILO</a>
                         <a id="nav-item4" href="#" id="logoutBTN" onclick="logout()">LOGOUT</a>
                         <a id="index-option" href="index.php" style="display:none;">TORNA ALLA HOMEPAGE</a>
                     </div>
                 </nav>
                 <!--navigationBar-->
-                <h1 class="head-title">Raccolta storie</h1>
+                <h1 class="head-title">Raccolta storie e test</h1>
                 <div class="search-area">
                     <input id="search-story" type="text" name="search" onfocusout="load_story_name(this)" placeholder="Cerca una storia...">
                 	<i id="id_search" class="fa fa-search" onclick="search_story(this)"></i>
