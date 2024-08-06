@@ -39,7 +39,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                 		if (empty($element['Immagine'])) {
                     		if ($element['Elimina Immagine'] == "true") {
                             	//IN QUESTO CASO L'IMMAGINE E' STATA CANCELLATA
-                    			$myUpdateStatement = $conn->prepare("UPDATE `$title` SET Testo = :paragraph, Immagine = :image, nome = :imgName, tipo = :imgType, Colore = :color WHERE id = :id");
+                    			$myUpdateStatement = $conn->prepare("UPDATE `$title` SET Testo = :paragraph, Immagine = :image, NomeImmagine = :imgName, TipoImmagine = :imgType, Colore = :color WHERE id = :id");
                     			$myUpdateStatement->bindParam(':paragraph', $element["Testo"]);
                         		$myUpdateStatement->bindParam(':image', $element["Immagine"]);
                    				$myUpdateStatement->bindParam(':imgName', $element["nome"]);
@@ -58,7 +58,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                     
                 		} else {
                 			//IN QUESTO CASO L'IMMAGINE E' STATA CAMBIATA
-                			$myUpdateStatement = $conn->prepare("UPDATE `$title` SET Testo = :paragraph, Immagine = :image, nome = :imgName, tipo = :imgType, Colore = :color WHERE id = :id");
+                			$myUpdateStatement = $conn->prepare("UPDATE `$title` SET Testo = :paragraph, Immagine = :image, NomeImmagine = :imgName, TipoImmagine = :imgType, Colore = :color WHERE id = :id");
                     		$myUpdateStatement->bindParam(':paragraph', $element["Testo"]);
                     		$myUpdateStatement->bindParam(':image', $element["Immagine"]);
                     		$myUpdateStatement->bindParam(':imgName', $element["nome"]);
@@ -69,7 +69,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                 		}
                     } else {
                     	//INSERISCI PARAGRAFI AGGIUNTI
-                    	$myInsertStatement = $conn->prepare("INSERT INTO `$title` (Testo, Immagine, nome, tipo, Colore) VALUES (:paragraph, :image, :imgName, :imgType, :color)");
+                    	$myInsertStatement = $conn->prepare("INSERT INTO `$title` (Testo, Immagine, NomeImmagine, TipoImmagine, Colore) VALUES (:paragraph, :image, :imgName, :imgType, :color)");
           				$myInsertStatement->bindParam(':paragraph', $element["Testo"]);
                     	$myInsertStatement->bindParam(':image', $element["Immagine"]);
                     	$myInsertStatement->bindParam(':imgName', $element["nome"]);
@@ -87,7 +87,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                 	if (empty($element['Immagine'])) {
                     	if ($element['Elimina Immagine'] == "true") {
                             //IN QUESTO CASO L'IMMAGINE E' STATA CANCELLATA
-                    		$myUpdateStatement = $conn->prepare("UPDATE `$title` SET Testo = :paragraph, Immagine = :image, nome = :imgName, tipo = :imgType, Colore = :color WHERE id = :id");
+                    		$myUpdateStatement = $conn->prepare("UPDATE `$title` SET Testo = :paragraph, Immagine = :image, NomeImmagine = :imgName, TipoImmagine = :imgType, Colore = :color WHERE id = :id");
                     		$myUpdateStatement->bindParam(':paragraph', $element["Testo"]);
                         	$myUpdateStatement->bindParam(':image', $element["Immagine"]);
                    			$myUpdateStatement->bindParam(':imgName', $element["nome"]);
@@ -106,7 +106,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                     
                 	} else {
                 		//IN QUESTO CASO L'IMMAGINE E' STATA CAMBIATA
-                		$myUpdateStatement = $conn->prepare("UPDATE `$title` SET Testo = :paragraph, Immagine = :image, nome = :imgName, tipo = :imgType, Colore = :color WHERE id = :id");
+                		$myUpdateStatement = $conn->prepare("UPDATE `$title` SET Testo = :paragraph, Immagine = :image, NomeImmagine = :imgName, TipoImmagine = :imgType, Colore = :color WHERE id = :id");
                     	$myUpdateStatement->bindParam(':paragraph', $element["Testo"]);
                     	$myUpdateStatement->bindParam(':image', $element["Immagine"]);
                     	$myUpdateStatement->bindParam(':imgName', $element["nome"]);
@@ -135,7 +135,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                 $myTruncateStatement->execute();
                 //RIPOPOLO LA TABELLA APPENA MODIFICATA
                 foreach ($resultModifiedTable as $element) {
-                	$myInsertStatement = $conn->prepare("INSERT INTO `$title` (Testo, Immagine, nome, tipo, Colore) VALUES (:paragraph, :image, :imgName, :imgType, :color)");
+                	$myInsertStatement = $conn->prepare("INSERT INTO `$title` (Testo, Immagine, NomeImmagine, TipoImmagine, Colore) VALUES (:paragraph, :image, :imgName, :imgType, :color)");
           			$myInsertStatement->bindParam(':paragraph', $element["Testo"]);
                     $myInsertStatement->bindParam(':image', $element["Immagine"]);
                     $myInsertStatement->bindParam(':imgName', $element["nome"]);
@@ -157,14 +157,162 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             $myDeleteStatement->execute();
 
             //*****************************MORALE*********************************** 
-            
+            /***********************************************
+            * AGGIONRAMENTO MODIFICHE PER LE DOMANDE IN UNA STORIA *
+            ***********************************************/
+            /*VERIFICO IN PRIMIS SE ESISTE IL RECORD CON MODIFICA DELLA STORIA ATTUALE*/   
+            if(strpos($titleTemp, ' (Modifica)') !== false) {  //QUANDO IL TITOLO CONTIENE (Modifica)
+            	$myModifiedQuestionStatement = $conn->prepare("SELECT * FROM Domande WHERE Storia = :story");
+          		$myModifiedQuestionStatement->bindParam(':story', $titleTemp);
+            	$myModifiedQuestionStatement->execute();
+                $results = $myModifiedQuestionStatement->fetchALL(PDO::FETCH_ASSOC);
+                if($results){
+                	/*(Modifica) ha valori quindi dobbiamo recoperarli ed aggiornare la storia*/
+                    foreach ($results as $result) {
+                        $id= $result["IdParagrafo"];
+                        $question= $result["Domanda"];
+                        $answer1= $result["Risposta1"];
+                        $answer2= $result["Risposta2"];
+                        $answer3= $result["Risposta3"];
+                        $answer4= $result["Risposta4"];
+                        $idParDest1= $result["idParDestinazione1"];
+                        $idParDest2= $result["idParDestinazione2"];
+                        $idParDest3= $result["idParDestinazione3"];
+                        $idParDest4= $result["idParDestinazione4"];
+                        $answerType1 = $result["esitoRisp1"];
+                        $answerType2 = $result["esitoRisp2"];
+                        $answerType3 = $result["esitoRisp3"];
+                        $answerType4 = $result["esitoRisp4"];
+                        /*Verifico se il record temporaneo attuale ha una corrispondenza con un record già salvato*/
+                        $myCheckQuestionStatement = $conn->prepare("SELECT * FROM Domande WHERE Storia = :story AND IdParagrafo = :id");
+                        $myCheckQuestionStatement->bindParam(':story', $title);
+                        $myCheckQuestionStatement->bindParam(':id', $id);
+                        $myCheckQuestionStatement->execute();
+                        $result = $myCheckQuestionStatement->fetch(PDO::FETCH_ASSOC);
+                        if($result){
+                        	/*C'E CORRISPONDENZA QUINDI DEVO AGGIORNARE IL VALORE*/
+                            $myUpdateQuestionStatement = $conn->prepare("UPDATE Domande SET 
+                                                            Storia = :story,
+                                                            IdParagrafo = :id,
+                                                            Domanda = :question, 
+                                                            Risposta1 = :answer1, 
+                                                            Risposta2 = :answer2, 
+                                                            Risposta3 = :answer3, 
+                                                            Risposta4 = :answer4, 
+                                                            idParDestinazione1 = :idParDest1, 
+                                                            idParDestinazione2 = :idParDest2, 
+                                                            idParDestinazione3 = :idParDest3, 
+                                                            idParDestinazione4 = :idParDest4,
+                                                            esitoRisp1 = :answerType1,
+                                                            esitoRisp2 = :answerType2,
+                                                            esitoRisp3 = :answerType3,
+                                                            esitoRisp4 = :answerType4
+                                                            WHERE Storia = :story AND IdParagrafo = :id");
+                            $myUpdateQuestionStatement->bindParam(':story', $title);
+                            $myUpdateQuestionStatement->bindParam(':id', $id);
+                            $myUpdateQuestionStatement->bindParam(':question', $question);
+                            $myUpdateQuestionStatement->bindParam(':answer1', $answer1);
+                            $myUpdateQuestionStatement->bindParam(':answer2', $answer2);
+                            $myUpdateQuestionStatement->bindParam(':idParDest1', $idParDest1);
+                            $myUpdateQuestionStatement->bindParam(':idParDest2', $idParDest2);
+                            $myUpdateQuestionStatement->bindParam(':answerType1', $answerType1);
+                      		  $myUpdateQuestionStatement->bindParam(':answerType2', $answerType2);
+                            if(!empty($answer3)) {
+                              $myUpdateQuestionStatement->bindParam(':answer3', $answer3);
+                              $myUpdateQuestionStatement->bindParam(':idParDest3', $idParDest3);
+                              $myUpdateQuestionStatement->bindParam(':answerType3', $answerType3);
+                            } else {
+                              $myUpdateQuestionStatement->bindValue(':answer3', NULL);
+                              $myUpdateQuestionStatement->bindValue(':idParDest3', NULL);
+                              $myUpdateQuestionStatement->bindValue(':answerType3', NULL);
+                            }
+                            if(!empty($answer4)) {
+                              $myUpdateQuestionStatement->bindParam(':answer4', $answer4);
+                              $myUpdateQuestionStatement->bindParam(':idParDest4', $idParDest4);
+                              $myUpdateQuestionStatement->bindParam(':answerType4', $answerType4);
+                            } else {
+                              $myUpdateQuestionStatement->bindValue(':answer4', NULL);
+                              $myUpdateQuestionStatement->bindValue(':idParDest4', NULL);
+                              $myUpdateQuestionStatement->bindValue(':answerType4', NULL);
+                            }
+                            $myUpdateQuestionStatement->execute();
+                        }else{
+                        	/*NON C'E CORRISPONDENZA QUINDI DEVO INSERIRE IL VALORE*/
+                            $myInsertQuestionStatement = $conn->prepare("INSERT INTO Domande 
+                                                  (Storia, IdParagrafo, Domanda, Risposta1, Risposta2, Risposta3, Risposta4, idParDestinazione1, idParDestinazione2, idParDestinazione3, idParDestinazione4, esitoRisp1, esitoRisp2, esitoRisp3, esitoRisp4) 
+                                                  VALUES (:story, :id, :question, :answer1, :answer2, :answer3, :answer4, :idParDest1, :idParDest2, :idParDest3, :idParDest4, :answerType1, :answerType2, :answerType3, :answerType4)");
+                            $myInsertQuestionStatement->bindParam(':story', $title);
+                            $myInsertQuestionStatement->bindParam(':id', $id);
+                            $myInsertQuestionStatement->bindParam(':question', $question);
+                            $myInsertQuestionStatement->bindParam(':answer1', $answer1);
+                            $myInsertQuestionStatement->bindParam(':answer2', $answer2);
+                            $myInsertQuestionStatement->bindParam(':idParDest1', $idParDest1);
+                            $myInsertQuestionStatement->bindParam(':idParDest2', $idParDest2);
+                            $myInsertQuestionStatement->bindParam(':answerType1', $answerType1);
+                      		$myInsertQuestionStatement->bindParam(':answerType2', $answerType2);
+                            if(!empty($answer3)) {
+                              $myInsertQuestionStatement->bindParam(':answer3', $answer3);
+                              $myInsertQuestionStatement->bindParam(':idParDest3', $idParDest3);
+                              $myInsertQuestionStatement->bindParam(':answerType3', $answerType3);
+                            } else {
+                              $myInsertQuestionStatement->bindValue(':answer3', NULL);
+                              $myInsertQuestionStatement->bindValue(':idParDest3', NULL);
+                              $myInsertQuestionStatement->bindValue(':answerType3', NULL);
+                            }
+                            if(!empty($answer4)) {
+                              $myInsertQuestionStatement->bindParam(':answer4', $answer4);
+                              $myInsertQuestionStatement->bindParam(':idParDest4', $idParDest4);
+                              $myInsertQuestionStatement->bindParam(':answerType4', $answerType4);
+                            } else {
+                              $myInsertQuestionStatement->bindValue(':answer4', NULL);
+                              $myInsertQuestionStatement->bindValue(':idParDest4', NULL);
+                              $myInsertQuestionStatement->bindValue(':answerType4', NULL);
+                            }
+                            $myInsertQuestionStatement->execute();    
+                        }
+                        /*ULTIMA VERIFICA -> SE UN RECORD NON ESISTE IN MODIFICA MA ESISTE NELL'ORIGINALE SIGNIFICA CHE DEVE ESSERE RIMOSSO */
+                        $myModifiedQuestionStatement = $conn->prepare("SELECT * FROM Domande WHERE Storia = :story");
+                        $myModifiedQuestionStatement->bindParam(':story', $title);
+                        $myModifiedQuestionStatement->execute();
+                        $main_results = $myModifiedQuestionStatement->fetchALL(PDO::FETCH_ASSOC);
+                        foreach ($main_results as $main_result) {
+                            $main_id= $main_result["IdParagrafo"];/* ID DEL PARAGRAFO ORIGINALE */
+                            $myCheckQuestionStatement = $conn->prepare("SELECT * FROM Domande WHERE Storia = :story AND IdParagrafo = :id");/* VERIFICO SE ESISTE UN RECORD TEMPORANEO PER L'ID DATO */
+                            $myCheckQuestionStatement->bindParam(':story', $titleTemp);
+                            $myCheckQuestionStatement->bindParam(':id', $main_id);
+                            $myCheckQuestionStatement->execute();
+                            $record = $myCheckQuestionStatement->fetch(PDO::FETCH_ASSOC);
+                            if($record){
+                                /*IL RECORD ESISTE QUINDI VERRA' AGGIORNATO*/
+                            }else{
+                                /*UN RECORD NOTO NEI VALORI ORIGINALI DELLA DOMANDA NON ESISTE NELLA MODIFICA, QUINDI DOBBIAMO ELIMINARLO */
+                                $myDeleteQuestionStatement = $conn->prepare("DELETE FROM Domande WHERE Storia = :story AND IdParagrafo = :id");
+                                $myDeleteQuestionStatement->bindParam(':story', $title);
+                                $myDeleteQuestionStatement->bindParam(':id', $main_id);
+                                $myDeleteQuestionStatement->execute(); 
+                            }
+                        }
+                	}
+
+                    /*Terminate le operazioni posso eliminare i record temporanei*/
+                    $myDeleteQuestionStatement = $conn->prepare("DELETE FROM Domande WHERE Storia = :story");
+                    $myDeleteQuestionStatement->bindParam(':story', $titleTemp);
+                    $myDeleteQuestionStatement->execute(); 
+                }else{
+                	/*La modifica non ha valori per le domande, il che significa che sono state rimosse tutte le domande*/
+                    $myDeleteQuestionStatement = $conn->prepare("DELETE FROM Domande WHERE Storia = :story");
+                    $myDeleteQuestionStatement->bindParam(':story', $title);
+                    $myDeleteQuestionStatement->execute(); 
+                }
+            }
+            /*FINE MODIFICHE*/
             //DROP TABLE DA STORIE TEMP + INVIO EMAIL MODIFICA APPROVATA
           	$myDeleteStatement = $conn->prepare("DELETE FROM `Storie Temp` WHERE Titolo = :title");
           	$myDeleteStatement->bindParam(':title', $titleTemp);
           	if($myDeleteStatement->execute()) {
               	$my_Delete_Statement = $conn->prepare("DROP TABLE `$titleTemp`");
               	if($my_Delete_Statement->execute()) {
-                  	$str = "Ciao $username!\nLa modifica della tua storia '$title' è stata approvata. La nuova versione ha sostituito quella precedente ed è già disponibile.\nIl team Pepper4Storytelling.\n";
+                  	$str = "Ciao $username!\nLa modifica di '$title' è stata approvata. La nuova versione ha sostituito quella precedente ed è già disponibile.\nIl team Pepper4Storytelling.\n";
                   	$msg = utf8_decode($str);
                   	mail($email, "Modifica accettata", $msg);
                   	header("location: profile.php"); 
@@ -174,7 +322,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
           	} else {
               	echo "<script type='text/javascript'>alert(\"Si è verificato un errore nella modifica della storia\")</script>";
           	}
-                    
             //FINE CONFIRM
             header("location: redirect_confirm.html");  
             
@@ -186,7 +333,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
               	$my_Delete_Statement = $conn->prepare("DROP TABLE `$titleTemp`");
               	if($my_Delete_Statement->execute()) {
                 	$deleteReason = $_POST['message'] ?? '';
-                  	$str = "Ciao $username!\nLa modifica della tua storia '$titleTemp' è stata rifiutata per il seguente motivo: " . "$deleteReason.\nIl team Pepper4Storytelling.\n";
+                  	$str = "Ciao $username!\nLa modifica del tuo contenuto '$titleTemp' è stato rifiutato per il seguente motivo: " . "$deleteReason.\nIl team Pepper4Storytelling.\n";
                   	$msg = utf8_decode($str);
                   	mail($email, "Modifica rifiutata", $msg);
                   	header("location: profile.php"); 
@@ -224,7 +371,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
               	$myDeleteStatement->bindParam(':title', $title);
               	if($myDeleteStatement->execute()) {          	
               		//RIMOSSA DA STORIE TEMP        	
-                	$str = "Ciao $username!\nLa tua storia '$title' è stata pubblicata, puoi trovarla nella sezione 'Profilo'.\nIl team Pepper4Storytelling.\n";
+                	$str = "Ciao $username!\nIl tuo contenuto '$title' è stato pubblicato, puoi trovarlo nella sezione 'Profilo'.\nIl team Pepper4Storytelling.\n";
                   	$msg = utf8_decode($str);
                   	mail($email, "Storia pubblicata", $msg);
                   	header("location: redirect_confirm.html");  
@@ -245,10 +392,20 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
           			$myDeleteStatement->bindParam(':title', $title);
                     $myDeleteStatement->execute();
                     
+                    /*Elimina record da Domande*/
+                    $myDeleteStatement = $conn->prepare("DELETE FROM `Domande` WHERE Storia = :title");
+          			$myDeleteStatement->bindParam(':title', $title);
+                    $myDeleteStatement->execute();
+                    
+                    /*Elimina record da TipoPubblicazione*/
+                    $my_storyType_Statement = $conn->prepare("DELETE FROM TipoPubblicazione WHERE Storia = :story");
+                    $my_storyType_Statement->bindParam(':story', $title);
+                    $my_storyType_Statement->execute();
+                    
                   	$deleteReason = $_POST['message'] ?? '';
-                  	$str = "Ciao $username!\nLa tua storia '$title' è stata rifiutata per il seguente motivo: " . "$deleteReason.\nIl team Pepper4Storytelling.\n";
+                  	$str = "Ciao $username!\nIl tuo contenuto '$title' è stato rifiutato per il seguente motivo: " . "$deleteReason.\nIl team Pepper4Storytelling.\n";
                   	$msg = utf8_decode($str);
-                  	mail($email, "Storia rifiutata", $msg);
+                  	mail($email, "Contenuto rifiutato", $msg);
                   	header("location: profile.php"); 
               	} else {
                   echo "<script type='text/javascript'>alert(\"Si è verificato un errore nella rimozione della storia\")</script>";
@@ -344,4 +501,3 @@ $conn = null;
     		</div>
     </body>
 </html>
-
