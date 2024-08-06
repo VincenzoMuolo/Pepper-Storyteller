@@ -9,7 +9,8 @@ $title_err = "";
 
 if (!(isset($_SESSION["Username"]) && $_SESSION["Username"] != "")) {
 	header('Refresh:1; url=https://pepper4storytelling.altervista.org/login.php');
-} else {
+}
+else {
 	// Processing form data when form is submitted
 	if($_SERVER["REQUEST_METHOD"] == "POST") {
     	$moral = $_POST['moral'] ?? '';
@@ -23,8 +24,9 @@ if (!(isset($_SESSION["Username"]) && $_SESSION["Username"] != "")) {
         $titleResult = $mySelectStatement->fetchAll(PDO::FETCH_ASSOC);
         if (count($titleResult) > 0) {
 			$title_err = "Esiste già una storia con questo nome";
-		} else if ($titleLenght < 3 || $titleLenght > 40) {
-        	if ($titleLenght < 3) $title_err = "La lunghezza minima del titolo è di 3 caratteri";
+		}
+        else if ($titleLenght < 3 || $titleLenght > 40) {
+            if ($titleLenght < 3) $title_err = "La lunghezza minima del titolo è di 3 caratteri";
         	else if ($titleLenght > 40) $title_err = "La lunghezza massima del titolo è di 40 caratteri";
         }
         else {
@@ -42,14 +44,15 @@ if (!(isset($_SESSION["Username"]) && $_SESSION["Username"] != "")) {
 								 NomeAudio VARCHAR(255) NULL,
 								 TipoAudio VARCHAR(255) NULL                                 
 								 )";
+
             if(!$conn->exec($myCreateStatement)) {
             	$counter = 0;
-    			foreach ($_POST['paragraph'] as $textArea) {
-                
+    			foreach ($_POST['paragraph'] as $textArea) {         
     				// Verifico eventuali problemi nell'upload del file
-                    if (!isset($_FILES["images"]) || $_FILES["images"]["error"][$counter] != UPLOAD_ERR_OK) 
-                    	console.log( "Errore nell'invio del file. Riprova!");
-                        
+                    if (!isset($_FILES["images"]) || $_FILES["images"]["error"][$counter] != UPLOAD_ERR_OK) {
+                    	error_log( "Errore nell'invio del file. Riprova!");
+                    }
+
                     $maxsize = 5242880; //MAX 5MB
                     
                     if ($_FILES["images"]["size"][$counter] >= $maxsize) {
@@ -65,7 +68,7 @@ if (!(isset($_SESSION["Username"]) && $_SESSION["Username"] != "")) {
 					$dati_file_immagine = file_get_contents($nome_file_temporaneo_immagine);
                     
                     if (!isset($_FILES["video"]) || $_FILES["video"]["error"][$counter] != UPLOAD_ERR_OK) 
-                    	console.log( "Errore nell'invio del file. Riprova!");                       
+                    	error_log( "Errore nell'invio del file. Riprova!");                       
                     
                     if ($_FILES["video"]["size"][$counter] >= $maxsize) {
             				$_SESSION["message"] = "File troppo grande. La dimensione deve essere inferiore a 5MB.";
@@ -80,9 +83,9 @@ if (!(isset($_SESSION["Username"]) && $_SESSION["Username"] != "")) {
 					$dati_file_video = file_get_contents($nome_file_temporaneo_video);
                              
                     
-                    if (!isset($_FILES["audio"]) || $_FILES["audio"]["error"][$counter] != UPLOAD_ERR_OK) 
-                    	console.log( "Errore nell'invio del file. Riprova!");                       
-                    
+                    if (!isset($_FILES["audio"]) || $_FILES["audio"]["error"][$counter] != UPLOAD_ERR_OK){
+                    	error_log( "Errore nell'invio del file. Riprova!");                       
+                    }
                     if ($_FILES["audio"]["size"][$counter] >= $maxsize) {
             				$_SESSION["message"] = "File troppo grande. La dimensione deve essere inferiore a 5MB.";
             		}
@@ -94,8 +97,7 @@ if (!(isset($_SESSION["Username"]) && $_SESSION["Username"] != "")) {
                     
                     // Leggo il contenuto del file
 					$dati_file_audio = file_get_contents($nome_file_temporaneo_audio);                                    
-    				
-                    
+    				                    
                     //INVIO COLORE
                     $color = $_POST["colors"][$counter];
              
@@ -112,12 +114,117 @@ if (!(isset($_SESSION["Username"]) && $_SESSION["Username"] != "")) {
     				$my_Insert_Statement->bindParam(':nome_file_vero_audio', $nome_file_vero_audio);
     				$my_Insert_Statement->bindParam(':tipo_file_audio', $tipo_file_audio);
     				if ($my_Insert_Statement->execute()) {
-        				console.log("Paragrafo pubblicato correttamente.");
-					} else {
-  						console.log("Errore nella pubblicazione del paragrafo");
+        				error_log("Paragrafo pubblicato correttamente.");
 					}
-        			$counter++;
-				}
+                    else {
+                        error_log("Errore nella pubblicazione del paragrafo");
+					}
+                    //Inizio modifiche per inserimento dati domande sul database
+                    //NUOVA AGGIUNTA PER IL TERMINA STORIA
+                    if(isset($_POST["idParDestF"][$counter]) && $_POST["idParDestF"][$counter] > 0){
+                    	$endStory = $_POST["idParDestF"][$counter];
+                        $question = "StoryEnding";
+                      	$idPar = $counter+1;
+                        $answer1 ="0";
+                        $answer2 = "0";
+                        $answer3 = "";
+                        $answer4 = "";
+                        $idParDest1 = $_POST["idParDestF"][$counter];
+                        $idParDest2 = "0";
+                        $idParDest3 = "";
+                        $idParDest4 = "";
+                        $answerType1 = null;
+                        $answerType2 = null;
+                        $answerType3 = null;
+                        $answerType4 = null;
+                        $my_Ending_Statement = $conn->prepare("INSERT INTO `Domande` (Storia, IdParagrafo, Domanda, Risposta1, Risposta2, Risposta3, Risposta4, idParDestinazione1, idParDestinazione2, idParDestinazione3, idParDestinazione4, esitoRisp1, esitoRisp2, esitoRisp3, esitoRisp4) VALUES (:title, :id_paragraph, :question, :answer1, :answer2, :answer3, :answer4, :idParDest1, :idParDest2, :idParDest3, :idParDest4, :answerType1, :answerType2, :answerType3, :answerType4)");
+                        $my_Ending_Statement->bindParam(':title', $title);
+                        $my_Ending_Statement->bindParam(':id_paragraph', $idPar);
+                        $my_Ending_Statement->bindParam(':question', $question);
+                        $my_Ending_Statement->bindParam(':answer1', $answer1);
+                        $my_Ending_Statement->bindParam(':answer2', $answer2);
+                        $my_Ending_Statement->bindParam(':idParDest1', $idParDest1);
+                        $my_Ending_Statement->bindParam(':idParDest2', $idParDest2);
+                        $my_Ending_Statement->bindValue(':answerType1', NULL);
+                        $my_Ending_Statement->bindValue(':answerType2', NULL);
+                        $my_Ending_Statement->bindValue(':answer3', NULL);
+                        $my_Ending_Statement->bindValue(':idParDest3', NULL);
+                        $my_Ending_Statement->bindValue(':answerType3', NULL);
+                        $my_Ending_Statement->bindValue(':answer4', NULL);
+                        $my_Ending_Statement->bindValue(':idParDest4', NULL);
+                        $my_Ending_Statement->bindValue(':answerType4', NULL);
+                        $my_Ending_Statement->execute();
+
+                    }else{
+                        if(isset($_POST["question"][$counter]) && strlen($_POST["question"][$counter]) > 0){
+                          //CARICAMENTO DATI DOMANDE
+                          $question = $_POST["question"][$counter];
+                          $idPar = $counter+1;
+                          $answer1 = $_POST["answer1"][$counter];
+                          $answer2 = $_POST["answer2"][$counter];
+                          $answer3 = $_POST["answer3"][$counter];
+                          $answer4 = $_POST["answer4"][$counter];
+                          $idParDest1 = $_POST["idParDest1"][$counter];
+                          $idParDest2 = $_POST["idParDest2"][$counter];
+                          $idParDest3 = $_POST["idParDest3"][$counter];
+                          $idParDest4 = $_POST["idParDest4"][$counter];
+                          $answerType1 = null;
+                          $answerType2 = null;
+                          $answerType3 = null;
+                          $answerType4 = null;
+
+                          // Aggiungi questi echo per visualizzare i valori
+                          echo "Domanda: " . $_POST["question"][$counter] . "<br>";
+                          echo "idPar: " . $idPar . "<br>";
+                          echo "answer1: " . $answer1 . "<br>";
+                          echo "answer2: " . $answer2 . "<br>";
+                          echo "answer3: " . (isset($answer3) ? $answer3 : 'NULL') . "<br>";
+                          echo "answer4: " . (isset($answer4) ? $answer4 : 'NULL') . "<br>";
+                          echo "idParDest1: " . $idParDest1 . "<br>";
+                          echo "idParDest2: " . $idParDest2 . "<br>";
+                          echo "idParDest3: " . (isset($idParDest3) ? $idParDest3 : 'NULL') . "<br>";
+                          echo "idParDest4: " . (isset($idParDest4) ? $idParDest4 : 'NULL') . "<br>";
+                          echo "answerType1: " . $answerType1 . "<br>";
+                          echo "answerType2: " . $answerType2 . "<br>";
+                          echo "answerType3: " . (isset($answerType3) ? $answerType3 : 'NULL') . "<br>";
+                          echo "answerType4: " . (isset($answerType4) ? $answerType4 : 'NULL') . "<br>";
+                          echo "idParDestF: " . (isset($idParDestF) ? $idParDestF : 'NULL') . "<br>";            
+
+                          $my_Question_Statement = $conn->prepare("INSERT INTO `Domande` (Storia, IdParagrafo, Domanda, Risposta1, Risposta2, Risposta3, Risposta4, idParDestinazione1, idParDestinazione2, idParDestinazione3, idParDestinazione4, esitoRisp1, esitoRisp2, esitoRisp3, esitoRisp4) VALUES (:title, :id_paragraph, :question, :answer1, :answer2, :answer3, :answer4, :idParDest1, :idParDest2, :idParDest3, :idParDest4, :answerType1, :answerType2, :answerType3, :answerType4)");
+                          $my_Question_Statement->bindParam(':title', $title);
+                          $my_Question_Statement->bindParam(':id_paragraph', $idPar);
+                          $my_Question_Statement->bindParam(':question', $question);
+                          $my_Question_Statement->bindParam(':answer1', $answer1);
+                          $my_Question_Statement->bindParam(':answer2', $answer2);
+                          $my_Question_Statement->bindParam(':idParDest1', $idParDest1);
+                          $my_Question_Statement->bindParam(':idParDest2', $idParDest2);
+                          $my_Question_Statement->bindParam(':answerType1', $answerType1);
+                          $my_Question_Statement->bindParam(':answerType2', $answerType2);
+
+                          if(!empty($answer3)) {
+                            $my_Question_Statement->bindParam(':answer3', $answer3);
+                            $my_Question_Statement->bindParam(':idParDest3', $idParDest3);
+                            $my_Question_Statement->bindParam(':answerType3', $answerType3);
+                          } else {
+                            $my_Question_Statement->bindValue(':answer3', NULL);
+                            $my_Question_Statement->bindValue(':idParDest3', NULL);
+                            $my_Question_Statement->bindValue(':answerType3', NULL);
+                          }
+                          if(!empty($answer4)) {
+                            $my_Question_Statement->bindParam(':answer4', $answer4);
+                            $my_Question_Statement->bindParam(':idParDest4', $idParDest4);
+                            $my_Question_Statement->bindParam(':answerType4', $answerType4);
+                          } else {
+                            $my_Question_Statement->bindValue(':answer4', NULL);
+                            $my_Question_Statement->bindValue(':idParDest4', NULL);
+                            $my_Question_Statement->bindValue(':answerType4', NULL);
+                          }
+                          $my_Question_Statement->execute();
+                        }
+                    }
+                    	//FINE MODIFICA
+        				$counter++;
+					}
                 
                 $my_Insert_Statement = $conn->prepare("INSERT INTO `Storie Temp` (Titolo, Username) VALUES (:title, :username)");
             	$my_Insert_Statement->bindParam(':title', $title);
@@ -129,12 +236,20 @@ if (!(isset($_SESSION["Username"]) && $_SESSION["Username"] != "")) {
                     $my_Insert_Statement->execute();
                     
                     $username = $_SESSION["Username"];
-                    
+                    $logFile = fopen("debug.log", "a");
+					fwrite($logFile, "Value of myVariable: " . "Username: ".$username. " Titolo storia: " .$title. " Morale storia" .$moral . "\n");
+					fclose($logFile);
                     $mySelectStatement = $conn->prepare("SELECT Email FROM Utenti WHERE Username = :username");
         			$mySelectStatement->bindParam(':username', $username);
     				$mySelectStatement->execute();
    					$result = $mySelectStatement->fetch(PDO::FETCH_ASSOC);
             		$email = $result['Email'];
+                    
+                    $type= "storia";
+                    $my_storyType_Statement = $conn->prepare("INSERT INTO `TipoPubblicazione` (Storia, Tipo) VALUES (:title, :type)");
+            		$my_storyType_Statement->bindParam(':title', $title);
+                	$my_storyType_Statement->bindParam(':type', $type);
+                    $my_storyType_Statement->execute();
                     
                     //NON FUNZIONA SU GMAIL DAL CELL:
                     $str = "Ciao $username!\nGrazie per il tuo contributo, un amministratore eseguirà un controllo sul materiale inviato per accertarsi che la storia sia coerente e soprattutto priva di contenuti inappropriati. Riceverai una comunicazione quando la storia sarà controllata.\nIl team Pepper4Storytelling.\n";
@@ -144,15 +259,17 @@ if (!(isset($_SESSION["Username"]) && $_SESSION["Username"] != "")) {
                  	mail($email, "Attesa pubblicazione", $msg);
                     header("location: new-story-confirm.html");
 					//echo "<script type='text/javascript'>alert(\"La tua storia è stata inviata correttamente. Riceverai una comunicazione via email quando sarà pubblicata\")</script>";
-                } else {
+                }
+                else {
                     //DROP TABLE TABELLA NOMESTORIA CHE SI E' CREATA UGUALMENTE            
 					echo "<script type='text/javascript'>alert(\"Si è verificato un errore nella pubblicazione della storia\")</script>";    
                 }
-            } else {
-				echo "<script type='text/javascript'>alert(\"Si è verificato un errore nella creazione della tabella\")</script>";
             }
-        }    
-	}
+            else {
+                echo "<script type='text/javascript'>alert(\"Si è verificato un errore nella creazione della tabella\")</script>"; 
+            }
+        }
+    }
 }
 unset($_SESSION['counter']);
 $conn = null;
@@ -189,11 +306,12 @@ $conn = null;
         <div class="topPage">
             <nav id="nav" class="navigation" style="background-color:transparent;">
                 <div class="left-nav-side">
-                    <h2 id="navbar-title">pepper storyteller</h2>
+                    <h2 id="navbar-title"><a href="homepage-logged.php" style="text-decoration: none; color: white;">pepper storyteller</a></h2>
                 </div>  
                 <div class="right-nav-side">
                     <a href="homepage-logged.php">HOMEPAGE</a>
                     <a href="new-story.php" class="nav-active">NUOVA STORIA</a>
+                    <a href="new-story-question.php">NUOVO TEST</a>
                     <a href="profile.php">PROFILO</a>
                     <a href="#" id="logoutBTN" onclick="logout()">LOGOUT</a>
                     <a id="nav-switch" href="#" onclick="enable_port_navbar();" style="border:none;"><i class="fas fa-bars nav-menu" ></i></a>
@@ -206,6 +324,7 @@ $conn = null;
                 <div class="right-nav-side-portrait">
                     <a href="homepage-logged.php" >HOMEPAGE</a>
                     <a href="new-story.php" class="nav-active">NUOVA STORIA</a>
+                    <a href="new-story-question.php">NUOVO TEST</a>
                     <a href="profile.php">PROFILO</a>
                     <a href="#" id="logoutBTN" onclick="logout()">LOGOUT</a>
                 </div>
@@ -214,6 +333,7 @@ $conn = null;
                 <form id="formData" enctype="multipart/form-data" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>" method="post">  
                     <div id="top-area" class="top-banner">
                     	<h2>Scrivi la tua storia</h2>
+                        <div class="absolute-text"><h2>Scrivi storie interattive!</h2><h3>Per scriverne una clicca <img src="images/qa.svg"> per inserire i dati della domanda</h3></div>
                         <div id="left-side-banner" class="top-banner-left-side">
                             <input id="title-text" type="text" name="title" placeholder="Titolo..." onfocusout="check_title()" class="form-control <?php echo (!empty($title_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $title; ?>" required>
                             <i class="fas fa-book"></i>
@@ -222,14 +342,14 @@ $conn = null;
                     </div>
                     <div id="help-panel" class="top-row">
                 		<div id="par-column" class="top-row-column">
-                        	<h3 id="help-text1" class="help-panel-text">PARAGRAFO</h3>
+                        	<h2 id="help-text1" class="help-panel-text">PARAGRAFO</h3>
                 	    	<div id="btn-container1" class="button-container">
                   		   		<input id="paragraph-button1" type="button" title="Aggiungi paragrafo" onclick="createParagraph()" value="AGGIUNGI">
                   		    	<input id="paragraph-button2" type="button" title="Rimuovi paragrafo" onclick="deleteParagraph()" value="RIMUOVI">
                 	    	</div>
                         </div>
                         <div id="mor-column" class="top-row-column">
-                	    	<h3 id="help-text2" class="help-panel-text">MORALE</h3>
+                	    	<h2 id="help-text2" class="help-panel-text">MORALE</h3>
                 	    	<div id="btn-container2" class="button-container">
                 	    		<input id="moral-button1" type="button" onclick="toggle_moral(this)" value="AGGIUNGI">
                 	    		<input id="moral-button2" type="button" onclick="toggle_moral(this)" value="RIMUOVI">
