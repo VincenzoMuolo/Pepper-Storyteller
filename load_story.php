@@ -46,8 +46,9 @@
                 <div id="paragraph-container" class="p-container" onload="show_button()">
                 	<h1 id="story_name"></h1>
                     <div id="modify-option" class="right-area" style="display:none;">
-                    	<i id="edit-button" class="fas fa-edit" onclick="edit_story(this)"></i>
-                        <i id="delete-button" class="fas fa-trash" onclick="remove_story(this)"></i>
+                    	<i id="test-button" class="fas fa-poll-h" onclick="load_test_result(this)" style="display:none;"><p>Esiti Test</p></i>
+                    	<i id="edit-button" class="fas fa-edit" onclick="edit_story(this)"><p>Modifica</p></i>
+                        <i id="delete-button" class="fas fa-trash" onclick="remove_story(this)"><p>Elimina</p></i>
                     </div>
                 </div>
                 <div class="loader-area-large">
@@ -69,4 +70,3 @@
         	</a>
     </body>
 </html>
-
