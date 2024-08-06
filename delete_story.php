@@ -21,11 +21,26 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     $myDeleteStatement = $conn->prepare("DELETE FROM `Storie` WHERE Titolo = :title");
     $myDeleteStatement->bindParam(':title', $title);
     if($myDeleteStatement->execute()) {
+    	//Elimina la morale all'eliminazione della storia
+        $myDeleteStatementMoral = $conn->prepare("DELETE FROM Morali WHERE Storia = :story");
+        $myDeleteStatementMoral->bindParam(':story', $title);
+        $myDeleteStatementMoral->execute();
+        //Elimina la morale all'eliminazione della storia
+        //Elimina le domande all'eliminazione della storia
+        $myDeleteStatementMoral = $conn->prepare("DELETE FROM Domande WHERE Storia = :story");
+        $myDeleteStatementMoral->bindParam(':story', $title);
+        $myDeleteStatementMoral->execute();
+        //Elimina le domande all'eliminazione della storia
+        
+        $my_storyType_Statement = $conn->prepare("DELETE FROM TipoPubblicazione WHERE Storia = :story");
+        $my_storyType_Statement->bindParam(':story', $title);
+        $my_storyType_Statement->execute();
+        
     	$my_Delete_Statement = $conn->prepare("DROP TABLE `$title`");
     	if($my_Delete_Statement->execute()) {
-            $str = "Ciao $username!\nLa tua storia '$title' è stata eliminata con successo.\nIl team Pepper4Storytelling.\n";
+            $str = "Ciao $username!\nIl tuo contenuto '$title' è stato eliminato con successo.\nIl team Pepper4Storytelling.\n";
             $msg = utf8_decode($str);
-            mail($email, "Storia eliminata", $msg);
+            mail($email, "Conferma eliminazione", $msg);
             header("location: profile.php"); 
          } else {
          	echo "<script type='text/javascript'>alert(\"Si è verificato un errore nella rimozione della storia\")</script>";
