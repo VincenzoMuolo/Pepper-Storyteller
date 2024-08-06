@@ -59,11 +59,12 @@ $conn = null;
             <!--navigationBar-->   
                 <nav id="nav" class="navigation" style="background-color:transparent;">
                     <div class="left-nav-side">
-                        <h2 id="navbar-title">pepper storyteller</h2>
+                        <h2 id="navbar-title"><a href="homepage-logged.php" style="text-decoration: none; color: white;">pepper storyteller</a></h2>
                     </div>  
                     <div class="right-nav-side">
                         <a href="homepage-logged.php">HOMEPAGE</a>
                         <a href="new-story.php" >NUOVA STORIA</a>
+                        <a href="new-story-question.php" >NUOVO TEST</a>
                         <a href="profile.php" class="nav-active">PROFILO</a>
                         <a href="#" id="logoutBTN" onclick="logout()">LOGOUT</a>
                         <a id="nav-switch" href="#" onclick="enable_port_navbar();" style="border:none;"><i class="fas fa-bars nav-menu" ></i></a>
@@ -76,19 +77,23 @@ $conn = null;
                     <div class="right-nav-side-portrait">
                         <a href="homepage-logged.php">HOMEPAGE</a>
                         <a href="new-story.php" >NUOVA STORIA</a>
+                        <a href="new-story-question.php" >NUOVO TEST</a>
                         <a href="profile.php" class="nav-active">PROFILO</a>
                         <a href="#" id="logoutBTN" onclick="logout()">LOGOUT</a>
                     </div>
                 </nav>
                 <!--navigationBar-->
-                <h1 class="head-title"> <?php echo "Benvenuto " . $_SESSION["Username"] ."!"; ?> </h1>          
+                <h1 class="head-title"> <?php echo "Ciao " . $_SESSION["Username"] ."!"; ?> </h1>          
               	<div class="main-container">
                 	<div class="menu-container">
                         <div id="user-function" class="text-container active" onclick="switch_function(this);">
                             <h2>Le mie Storie</h2>	
                         </div>
+                        <div id="user-test-function" class="text-container" onclick="switch_function(this);">
+                        	<h2>I miei Test</h2>	
+                        </div>
                         <div id="admin-function" class="text-container" onclick="switch_function(this);">
-                            <h2>Storie da validare</h2>	
+                            <h2>Storie/Test da validare</h2>	
                         </div>
                     </div>
                     <form method="post" action="load_story_paragraph.php">
@@ -101,8 +106,15 @@ $conn = null;
                         </div>
                         <div id="story-tovalidate-container" style="display:none;" class="grid-container">
                         <div id="no-story-to-validate" style="display:none;" class="message-cont"> 
-                        	<p class="story-message">Al momento non ci sono storie da controllare.</p></div>
+                        	<p class="story-message">Al momento non ci sono storie/test da controllare.</p></div>
                     	</div>
+                        <div id="test-container" style="display:none;" class="grid-container">
+                        	<div id="if-no-tests" style="display:none;" class="message-cont">
+                                <p class="story-message">Al momento non hai nessun test pubblicato.</p> 
+                                <a class="story-message href" href="new-story-question.php">Clicca qui</a>
+                                <p class="story-message"> per scriverne uno.</p>
+                        	</div>
+                        </div>
                     </form>
         	</div>            
     	</div>                
