@@ -101,6 +101,58 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 			} else {
   				console.log("Errore nella pubblicazione del paragrafo");
 			}
+            
+            //Inizio modifiche per inserimento dati domande sul database
+            if(isset($_POST["question"][$counter])){		$question = $_POST["question"][$counter];	}
+            if($question !== null && strlen($question) > 0){
+              //CARICAMENTO DATI DOMANDE
+              $idPar = $counter+1;
+              $answer1 = $_POST["answer1"][$counter];
+              $answer2 = $_POST["answer2"][$counter];
+              $answer3 = $_POST["answer3"][$counter];
+              $answer4 = $_POST["answer4"][$counter];
+              $idParDest1 = $_POST["idParDest1"][$counter];
+              $idParDest2 = $_POST["idParDest2"][$counter];
+              $idParDest3 = $_POST["idParDest3"][$counter];
+              $idParDest4 = $_POST["idParDest4"][$counter];
+              $answerType1 = $_POST["answerType1"][$counter];
+              $answerType2 = $_POST["answerType2"][$counter];
+              $answerType3 = $_POST["answerType3"][$counter];
+              $answerType4 = $_POST["answerType4"][$counter];
+ 
+              $my_Question_Statement = $conn->prepare("INSERT INTO `Domande` (Storia, IdParagrafo, Domanda, Risposta1, Risposta2, Risposta3, Risposta4, idParDestinazione1, idParDestinazione2, idParDestinazione3, idParDestinazione4, esitoRisp1, esitoRisp2, esitoRisp3, esitoRisp4) VALUES (:title, :id_paragraph, :question, :answer1, :answer2, :answer3, :answer4, :id_par_dest1, :id_par_dest2, :id_par_dest3, :id_par_dest4, :answerType1, :answerType2, :answerType3, :answerType4)");
+              $my_Question_Statement->bindParam(':title', $titleTemp);
+              $my_Question_Statement->bindParam(':id_paragraph', $idPar);
+              $my_Question_Statement->bindParam(':question', $question);
+              $my_Question_Statement->bindParam(':answer1', $answer1);
+              $my_Question_Statement->bindParam(':answer2', $answer2);
+              $my_Question_Statement->bindParam(':id_par_dest1', $idParDest1);
+              $my_Question_Statement->bindParam(':id_par_dest2', $idParDest2);
+              $my_Question_Statement->bindParam(':answerType1', $answerType1);
+              $my_Question_Statement->bindParam(':answerType2', $answerType2);
+
+              if(!empty($answer3)) {
+                $my_Question_Statement->bindParam(':answer3', $answer3);
+                $my_Question_Statement->bindParam(':id_par_dest3', $idParDest3);
+                $my_Question_Statement->bindParam(':answerType3', $answerType3);
+              } else {
+                $my_Question_Statement->bindValue(':answer3', NULL);
+                $my_Question_Statement->bindValue(':id_par_dest3', NULL);
+                $my_Question_Statement->bindValue(':answerType3', NULL);
+              }
+              if(!empty($answer4)) {
+                $my_Question_Statement->bindParam(':answer4', $answer4);
+                $my_Question_Statement->bindParam(':id_par_dest4', $idParDest4);
+                $my_Question_Statement->bindParam(':answerType4', $answerType4);
+              } else {
+                $my_Question_Statement->bindValue(':answer4', NULL);
+                $my_Question_Statement->bindValue(':id_par_dest4', NULL);
+                $my_Question_Statement->bindValue(':answerType4', NULL);
+              }
+              $my_Question_Statement->execute();
+            }
+          //FINE MODIFICA
+            
     		$counter++;
 		}//fine for each                                             
     }
@@ -185,18 +237,21 @@ $conn = null;
               			<h2 style="color: #292d33; margin-top:150px; align-self:flex-start; font-size: 40px;">Modifica storia</h2>
                   		<div class="top-banner-left-side"style=" width : 100%;">
                       		<h2 id="title_text" name="title_text" style=" width : 100%; color: #292d33; margin-top: -20px; align-self:center; font-size: 62px;"></h2>
-                  		</div>
+                  			<div class="loader-area-large">
+                        		<div id="loading-ring" class="lds-ring"><div></div><div></div><div></div><div></div></div>
+                    		</div> 
+                        </div>
            			</div>
                     <div id="help-panel" class="top-row" style="background-color: #292d33; position: absolute; top:0px;">
                 		<div id="par-column" class="top-row-column">
-                        	<h3 id="help-text1" class="help-panel-text">PARAGRAFO</h3>
+                        	<h2 id="help-text1" class="help-panel-text">PARAGRAFO</h2>
                 	    	<div id="btn-container1" class="button-container">
                   		   		<input id="paragraph-button1" type="button" title="Aggiungi paragrafo" onclick="createParagraph()" value="AGGIUNGI">
                   		    	<input id="paragraph-button2" type="button" title="Rimuovi paragrafo" onclick="deleteParagraph()" value="RIMUOVI">
                 	    	</div>
                         </div>
                         <div id="mor-column" class="top-row-column">
-                	    	<h3 id="help-text2" class="help-panel-text">MORALE</h3>
+                	    	<h2 id="help-text2" class="help-panel-text">MORALE</h2>
                 	    	<div id="btn-container2" class="button-container">
                 	    		<input id="moral-button1" type="button" onclick="toggle_moral(this)" value="AGGIUNGI">
                 	    		<input id="moral-button2" type="button" onclick="toggle_moral(this)" value="RIMUOVI">
@@ -214,4 +269,4 @@ $conn = null;
             </div>
         </div>
     </body>
-</html>                 
+</html>                               
